@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.1" xml:lang="en-US">
+  <compounddef id="dir_902d6fe55786be073ae6681293cdb979" kind="dir">
+    <compoundname>gnuradio</compoundname>
+    <innerdir refid="dir_9e0b3f35f961a59dbd0fa77a361fe917">adsb</innerdir>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/media/sf_GitHub/mockingBird/gr-adsb/include/gnuradio/"/>
+  </compounddef>
+</doxygen>
