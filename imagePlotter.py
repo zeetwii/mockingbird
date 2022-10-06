@@ -6,6 +6,7 @@ import tkinter as tk # needed for gui
 import cv2 # needed for finding black pixels
 import numpy as np # needed for pixel math
 import random # needed for picking random pixels to paint
+import math # needed for coord calcs
 
 class ImagePlotter:
     '''Class that handles painting planes'''
@@ -19,8 +20,6 @@ class ImagePlotter:
         # makes the list of points to paint
         self.pixelList = self.__listBlack(imgFile)
         
-
-        #print(str(targetPixels))
         #print(f"Center pixel: {str(self.centerWidth)}, {str(self.centerHeight)}")
 
     def updateLocation(self, lat, lon, width):
@@ -63,8 +62,34 @@ class ImagePlotter:
         Takes a list of pixels and returns a list of coordinates
         '''
 
-        print(targetPixels)
-        # TODO: fix this
+        # gets the ratio of kilometers per pixel by dividing the max km width by total width in pixels
+        kmPerPix = self.width / (self.centerWidth * 2)
+
+        # radius of the earth
+        rEarth = 6371
+
+        debugFile = open("test.txt", 'w')
+
+        #print(targetPixels)
+        for target in targetPixels:
+            
+            # get angle and distance of each target point from the center
+            angle = math.atan2(target[0] - self.centerHeight, target[1] - self.centerWidth) * (180 / math.pi)
+            distPix = math.sqrt(pow(target[1] - self.centerWidth, 2) + pow(target[0] - self.centerHeight, 2))
+
+            # get bearing in rads and dist in km
+            bearing = math.radians(90 + angle)
+            distKM = distPix * kmPerPix
+
+            # get the target lat lon
+            targetLat = math.asin(math.sin(self.centerLat)*math.cos(distKM / rEarth) + math.cos(self.centerLat)*math.sin(distKM / rEarth)*math.cos(bearing))
+            targetLon = self.centerLon + math.atan2(math.sin(bearing)*math.sin(distKM / rEarth)*math.cos(self.centerLat),math.cos(distKM / rEarth)-math.sin(self.centerLat)*math.sin(targetLat))
+            targetLat = math.degrees(targetLat)
+            targetLon = math.degrees(targetLon)
+
+            #print(f"{str(targetLon)},{str(targetLat)}")
+            debugFile.write(f"{str(targetLon)},{str(targetLat)}\n")
+            
 
 
     def __listBlack(self, imgFile):
@@ -76,7 +101,7 @@ class ImagePlotter:
             imgFile (file): The image file to load and read
 
         Returns:
-            list: list of XY coordinates
+            list: list of pixel coordinates in the format of [Height, Width]
         """
 
         # loads the image and converts it into a grayscale one
@@ -97,7 +122,7 @@ class ImagePlotter:
         #print(coords)
 
         
-        # Sanitity check by redrawing the new image
+        # Sanity check by redrawing the new image
         # Create mask of all pixels lower than threshold level
         #mask = gray < threshold
         # Color the pixels in the mask
@@ -116,4 +141,5 @@ if __name__ == '__main__':
     root.withdraw()
     imgFile = askopenfilename(title="select image to use", filetypes=(("PNG files", ".png"), ("JPEG files", ".jpg"), ("all files", ".")))
 
-    painter = ImagePlotter(imgFile, 0, 0, 1000)
+    painter = ImagePlotter(imgFile, 0, 0, 10000)
+    painter.getCoords(500)
