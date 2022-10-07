@@ -9,12 +9,23 @@ import random # needed for picking random pixels to paint
 import math # needed for coord calcs
 
 class ImagePlotter:
-    '''Class that handles painting planes'''
+    """
+    Class that handles converting image points into lat lon coordinates
+    """
 
     def __init__(self, imgFile, lat, lon, width):
+        """
+        Initalization method
+
+        Args:
+            imgFile (_type_): _description_
+            lat (_type_): _description_
+            lon (_type_): _description_
+            width (_type_): _description_
+        """
         
-        self.centerLat = float(lat)
-        self.centerLon = float(lon)
+        self.centerLat = math.radians(float(lat))
+        self.centerLon = math.radians(float(lon))
         self.width = float(width)
 
         # makes the list of points to paint
@@ -27,13 +38,13 @@ class ImagePlotter:
         Updates the central location and width to be used in coordinate generation
 
         Args:
-            lat (float): the center lat point
-            lon (float): the center lon point
+            lat (float): the center lat point in degrees
+            lon (float): the center lon point in degrees
             width (float): the width in km of the image when painted
         """
 
-        self.centerLat = float(lat)
-        self.centerLon = float(lon)
+        self.centerLat = math.radians(float(lat))
+        self.centerLon = math.radians(float(lon))
         self.width = float(width)
 
     def updateImage(self, imgFile):
@@ -64,6 +75,7 @@ class ImagePlotter:
 
         # gets the ratio of kilometers per pixel by dividing the max km width by total width in pixels
         kmPerPix = self.width / (self.centerWidth * 2)
+        #print(f"km per pixel: {str(kmPerPix)}")
 
         # radius of the earth
         rEarth = 6371
@@ -80,15 +92,18 @@ class ImagePlotter:
             # get bearing in rads and dist in km
             bearing = math.radians(90 + angle)
             distKM = distPix * kmPerPix
+            #print(f"{str(bearing)} {str(distKM)}")
 
             # get the target lat lon
             targetLat = math.asin(math.sin(self.centerLat)*math.cos(distKM / rEarth) + math.cos(self.centerLat)*math.sin(distKM / rEarth)*math.cos(bearing))
+            #print(str(targetLat))
             targetLon = self.centerLon + math.atan2(math.sin(bearing)*math.sin(distKM / rEarth)*math.cos(self.centerLat),math.cos(distKM / rEarth)-math.sin(self.centerLat)*math.sin(targetLat))
+            #print(str(targetLon))
             targetLat = math.degrees(targetLat)
             targetLon = math.degrees(targetLon)
 
             #print(f"{str(targetLon)},{str(targetLat)}")
-            debugFile.write(f"{str(targetLon)},{str(targetLat)}\n")
+            debugFile.write(f"{str(format(targetLon, '.20f'))},{str(format(targetLat, '.20f'))}\n")
             
 
 
@@ -141,5 +156,5 @@ if __name__ == '__main__':
     root.withdraw()
     imgFile = askopenfilename(title="select image to use", filetypes=(("PNG files", ".png"), ("JPEG files", ".jpg"), ("all files", ".")))
 
-    painter = ImagePlotter(imgFile, 0, 0, 10000)
-    painter.getCoords(500)
+    painter = ImagePlotter(imgFile, 33.0, -70.0, 100)
+    painter.getCoords(100)
