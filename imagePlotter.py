@@ -120,8 +120,17 @@ class ImagePlotter:
         """
 
         # loads the image and converts it into a grayscale one
-        image = cv2.imread(imgFile)
-        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        image = cv2.imread(imgFile, cv2.IMREAD_UNCHANGED) # grabs transparent pixels
+
+        # converts transparent pixels to white
+        alpha_channel = image[: ,: , 3]
+        _, mask = cv2.threshold(alpha_channel, 254, 255, cv2.THRESH_BINARY) # binarize mask
+        color = image[: ,: ,: 3]
+        newImg = cv2.bitwise_not(cv2.bitwise_not(color, mask = mask))
+
+
+
+        gray = cv2.cvtColor(newImg, cv2.COLOR_BGR2GRAY)
 
         # grab center
         height, width = gray.shape
@@ -156,5 +165,5 @@ if __name__ == '__main__':
     root.withdraw()
     imgFile = askopenfilename(title="select image to use", filetypes=(("PNG files", ".png"), ("JPEG files", ".jpg"), ("all files", ".")))
 
-    painter = ImagePlotter(imgFile, 33.0, -70.0, 100)
-    painter.getCoords(100)
+    painter = ImagePlotter(imgFile, 33.0, -70.0, 1000)
+    painter.getCoords(300)
