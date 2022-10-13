@@ -80,7 +80,8 @@ class ImagePlotter:
         # radius of the earth
         rEarth = 6371
 
-        debugFile = open("test.txt", 'w')
+        # empty target list
+        targetList = []
 
         #print(targetPixels)
         for target in targetPixels:
@@ -101,11 +102,10 @@ class ImagePlotter:
             #print(str(targetLon))
             targetLat = math.degrees(targetLat)
             targetLon = math.degrees(targetLon)
-
+            targetList.append([targetLat, targetLon])
             #print(f"{str(targetLon)},{str(targetLat)}")
-            debugFile.write(f"{str(format(targetLon, '.20f'))},{str(format(targetLat, '.20f'))}\n")
-            
 
+        return targetList
 
     def __listBlack(self, imgFile):
         """
@@ -128,8 +128,7 @@ class ImagePlotter:
         color = image[: ,: ,: 3]
         newImg = cv2.bitwise_not(cv2.bitwise_not(color, mask = mask))
 
-
-
+        # convert to grayscale
         gray = cv2.cvtColor(newImg, cv2.COLOR_BGR2GRAY)
 
         # grab center
@@ -137,14 +136,12 @@ class ImagePlotter:
         self.centerHeight = round(height / 2)
         self.centerWidth = round(width / 2)
 
-
         # threshold of what counts as black
         threshold = 128
 
         # find coordinates of all pixels below threshold
         coords = np.column_stack(np.where(gray < threshold))
         #print(coords)
-
         
         # Sanity check by redrawing the new image
         # Create mask of all pixels lower than threshold level
@@ -165,5 +162,12 @@ if __name__ == '__main__':
     root.withdraw()
     imgFile = askopenfilename(title="select image to use", filetypes=(("PNG files", ".png"), ("JPEG files", ".jpg"), ("all files", ".")))
 
-    painter = ImagePlotter(imgFile, 33.0, -70.0, 1000)
-    painter.getCoords(300)
+    painter = ImagePlotter(imgFile, 33.0, -70.0, 10000)
+    coords = painter.getCoords(300)
+
+    debug = open('test.txt', 'w')
+    
+    for target in coords:
+        # for use with: https://dwtkns.com/pointplotter/
+        debug.write(f"{str(format(target[1], '.20f'))}, {str(format(target[0], '.20f'))}\n")
+    debug.close()
