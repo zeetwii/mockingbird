@@ -2,11 +2,18 @@
 
 from tkinter.filedialog import askopenfilename # used for file select dialog
 import tkinter as tk # needed for gui
-
 import cv2 # needed for finding black pixels
 import numpy as np # needed for pixel math
 import random # needed for picking random pixels to paint
 import math # needed for coord calcs
+
+from sklearn.cluster import DBSCAN # needed for DBSCAN clustering
+from sklearn.neighbors import NearestNeighbors # needed for helping find epsilon
+from kneed import KneeLocator # needed for helping to find epsilon
+
+from PIL import Image # needed for debugging
+import pandas as pd # debugging
+import matplotlib.pyplot as plt # needed for visualization
 
 class ImagePlotter:
     """
@@ -15,7 +22,7 @@ class ImagePlotter:
 
     def __init__(self, imgFile, lat, lon, width):
         """
-        Initalization method
+        Initialization method
 
         Args:
             imgFile (_type_): _description_
@@ -63,10 +70,11 @@ class ImagePlotter:
         Pulls a user given number of lat lon coordinates from the loaded image and returns them
         '''
 
+        self.__clusterData(self.pixelList)
+
         targetPixels = random.sample(self.pixelList, numTargets)
 
         return self.__pixelsToCoords(targetPixels)
-
 
     def __pixelsToCoords(self, targetPixels):
         '''
@@ -107,6 +115,40 @@ class ImagePlotter:
 
         return targetList
 
+    def __clusterData(self, pixelList):
+        '''
+        Given a list of pixels, performs a clustering algorithm to look for points
+        '''
+
+        # gets distance from all neighbours
+        neighbors = NearestNeighbors(n_neighbors=11).fit(np.asarray(pixelList))
+        distances, indices = neighbors.kneighbors(np.asarray(pixelList))
+        distances = np.sort(distances[:,10], axis=0)
+
+        # find knee point
+        knee = KneeLocator(np.arange(len(distances)), distances, S=1, curve='convex', direction='increasing', interp_method='polynomial')
+
+        fig = plt.figure(figsize=(5, 5))
+        knee.plot_knee()
+        plt.xlabel("Points")
+        plt.ylabel("Distance")
+
+        print(distances[knee.knee])
+
+        #input("test")
+        
+        dbClusters = DBSCAN(eps=2, min_samples=8).fit(np.asarray(pixelList))
+
+        # Number of Clusters
+        labels=dbClusters.labels_
+        N_clus=len(set(labels))-(1 if -1 in labels else 0)
+        print('Estimated no. of clusters: %d' % N_clus)
+
+        # Identify Noise
+        n_noise = list(dbClusters.labels_).count(-1)
+        print('Estimated no. of noise points: %d' % n_noise)
+        
+
     def __listBlack(self, imgFile):
         """
         Returns a list of every black pixel in the provided image. 
@@ -120,16 +162,10 @@ class ImagePlotter:
         """
 
         # loads the image and converts it into a grayscale one
-        image = cv2.imread(imgFile, cv2.IMREAD_UNCHANGED) # grabs transparent pixels
-
-        # converts transparent pixels to white
-        alpha_channel = image[: ,: , 3]
-        _, mask = cv2.threshold(alpha_channel, 254, 255, cv2.THRESH_BINARY) # binarize mask
-        color = image[: ,: ,: 3]
-        newImg = cv2.bitwise_not(cv2.bitwise_not(color, mask = mask))
+        image = cv2.imread(imgFile) # grabs transparent pixels
 
         # convert to grayscale
-        gray = cv2.cvtColor(newImg, cv2.COLOR_BGR2GRAY)
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
         # grab center
         height, width = gray.shape
@@ -162,12 +198,13 @@ if __name__ == '__main__':
     root.withdraw()
     imgFile = askopenfilename(title="select image to use", filetypes=(("PNG files", ".png"), ("JPEG files", ".jpg"), ("all files", ".")))
 
-    painter = ImagePlotter(imgFile, 33.0, -70.0, 10000)
-    coords = painter.getCoords(300)
+    painter = ImagePlotter(imgFile, 38.6001, -77.1622, 100)
 
-    debug = open('test.txt', 'w')
+    coords = painter.getCoords(100)
+
+    #debug = open('test.txt', 'w')
     
-    for target in coords:
+    #for target in coords:
         # for use with: https://dwtkns.com/pointplotter/
-        debug.write(f"{str(format(target[1], '.20f'))}, {str(format(target[0], '.20f'))}\n")
-    debug.close()
+    #    debug.write(f"{str(format(target[1], '.20f'))}, {str(format(target[0], '.20f'))}\n")
+    #debug.close()

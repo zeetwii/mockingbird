@@ -61,6 +61,22 @@ blocks:
     coordinate: [32, 180.0]
     rotation: 0
     state: true
+- name: blocks_float_to_complex_0
+  id: blocks_float_to_complex
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [184, 272.0]
+    rotation: 0
+    state: true
 - name: blocks_throttle_0
   id: blocks_throttle
   parameters:
@@ -79,7 +95,7 @@ blocks:
     bus_structure: null
     coordinate: [232, 180.0]
     rotation: 0
-    state: true
+    state: disabled
 - name: qtgui_sink_x_0
   id: qtgui_sink_x
   parameters:
@@ -108,12 +124,64 @@ blocks:
     bus_structure: null
     coordinate: [392, 148.0]
     rotation: 0
+    state: disabled
+- name: qtgui_sink_x_1
+  id: qtgui_sink_x
+  parameters:
+    affinity: ''
+    alias: ''
+    bw: samp_rate
+    comment: ''
+    fc: 1090e6
+    fftsize: '1024'
+    gui_hint: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    name: '""'
+    plotconst: 'True'
+    plotfreq: 'True'
+    plottime: 'True'
+    plotwaterfall: 'True'
+    rate: '10'
+    showports: 'False'
+    showrf: 'True'
+    type: complex
+    wintype: window.WIN_BLACKMAN_hARRIS
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [416, 340.0]
+    rotation: 0
+    state: true
+- name: soapy_hackrf_sink_0
+  id: soapy_hackrf_sink
+  parameters:
+    affinity: ''
+    alias: ''
+    amp: 'True'
+    bandwidth: '0'
+    center_freq: 1090e6
+    comment: ''
+    dev_args: ''
+    samp_rate: samp_rate
+    type: fc32
+    vga: '47'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [424, 264.0]
+    rotation: 0
     state: true
 
 connections:
+- [adsb_adsbGen_0, '0', blocks_float_to_complex_0, '0']
 - [adsb_adsbGen_0, '0', blocks_throttle_0, '0']
+- [blocks_float_to_complex_0, '0', qtgui_sink_x_1, '0']
+- [blocks_float_to_complex_0, '0', soapy_hackrf_sink_0, '0']
 - [blocks_throttle_0, '0', qtgui_sink_x_0, '0']
 
 metadata:
   file_format: 1
-  grc_version: 3.10.2.0
+  grc_version: 3.10.4.0
