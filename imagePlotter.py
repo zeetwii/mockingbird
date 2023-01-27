@@ -70,9 +70,25 @@ class ImagePlotter:
         Pulls a user given number of lat lon coordinates from the loaded image and returns them
         '''
 
-        self.__clusterData(self.pixelList)
+        clusterPoints = self.__clusterData(self.pixelList)
+        targetPixels = [] # the eventual list of pixels to paint
 
-        targetPixels = random.sample(self.pixelList, numTargets)
+        # gets the number of targets that will be pulled from each cluster
+        targetsPerCluster = round(numTargets / len(clusterPoints)) 
+
+        for i in range(len(clusterPoints)):
+
+            # calculate the spacing to even distrubute the target pixels within the cluster
+            gap = math.floor(len(clusterPoints[i]) / targetsPerCluster)
+            val = 0 # variable to move through cluster list
+
+            # collect targets from cluster
+            while val < len(clusterPoints[i]):
+                targetPixels.append(clusterPoints[i][val])
+                val = val + gap # increment value to next point to add
+
+        #targetPixels = random.sample(self.pixelList, numTargets)
+        #print(str(len(targetPixels)))
 
         return self.__pixelsToCoords(targetPixels)
 
@@ -127,27 +143,32 @@ class ImagePlotter:
 
         # find knee point
         knee = KneeLocator(np.arange(len(distances)), distances, S=1, curve='convex', direction='increasing', interp_method='polynomial')
-
-        fig = plt.figure(figsize=(5, 5))
-        knee.plot_knee()
-        plt.xlabel("Points")
-        plt.ylabel("Distance")
-
-        print(distances[knee.knee])
-
-        #input("test")
         
-        dbClusters = DBSCAN(eps=2, min_samples=8).fit(np.asarray(pixelList))
+        # use knee point to calculate clusters
+        dbClusters = DBSCAN(eps=distances[knee.knee], min_samples=8).fit(np.asarray(pixelList))
 
         # Number of Clusters
-        labels=dbClusters.labels_
-        N_clus=len(set(labels))-(1 if -1 in labels else 0)
-        print('Estimated no. of clusters: %d' % N_clus)
-
-        # Identify Noise
-        n_noise = list(dbClusters.labels_).count(-1)
-        print('Estimated no. of noise points: %d' % n_noise)
+        nClusters=len(set(dbClusters.labels_))-(1 if -1 in dbClusters.labels_ else 0)
+        #print(str(nClusters))
         
+        # creates a list of lists to hold each point in its cluster
+        clusterPoints = []
+        for i in range(nClusters):
+            clusterPoints.append([])
+
+        #print(str(clusterPoints))
+
+        # put each pixel in the cluster list its a part of
+        for i in range(len(pixelList)):
+            if dbClusters.labels_[i] != -1: # if not a un-clustered point, add to list
+                clusterPoints[dbClusters.labels_[i]].append(pixelList[i])
+         
+        # print method for debugging
+        #for i in range(len(clusterPoints)):
+            #print(str(len(clusterPoints[i])))
+
+        return clusterPoints
+
 
     def __listBlack(self, imgFile):
         """
@@ -198,13 +219,13 @@ if __name__ == '__main__':
     root.withdraw()
     imgFile = askopenfilename(title="select image to use", filetypes=(("PNG files", ".png"), ("JPEG files", ".jpg"), ("all files", ".")))
 
-    painter = ImagePlotter(imgFile, 38.6001, -77.1622, 100)
+    painter = ImagePlotter(imgFile, 38.6001, -77.1622, 10000)
 
-    coords = painter.getCoords(100)
+    coords = painter.getCoords(200)
 
-    #debug = open('test.txt', 'w')
+    debug = open('test.txt', 'w')
     
-    #for target in coords:
+    for target in coords:
         # for use with: https://dwtkns.com/pointplotter/
-    #    debug.write(f"{str(format(target[1], '.20f'))}, {str(format(target[0], '.20f'))}\n")
-    #debug.close()
+        debug.write(f"{str(format(target[1], '.20f'))}, {str(format(target[0], '.20f'))}\n")
+    debug.close()
