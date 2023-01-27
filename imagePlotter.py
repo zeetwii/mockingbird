@@ -54,6 +54,8 @@ class ImagePlotter:
         self.centerLon = math.radians(float(lon))
         self.width = float(width)
 
+        # TODO: Make this update picture coords
+
     def updateImage(self, imgFile):
         """
         updates all of the pixel maps with the new image
@@ -64,6 +66,8 @@ class ImagePlotter:
 
         # makes the list of points to paint
         self.pixelList = self.__listBlack(imgFile)
+
+        # TODO: Have this update the rest of the image stuff
 
     def getCoords(self, numTargets):
         '''
