@@ -78,19 +78,25 @@ class ImagePlotter:
         targetPixels = [] # the eventual list of pixels to paint
 
         # gets the number of targets that will be pulled from each cluster
-        targetsPerCluster = round(numTargets / len(clusterPoints)) 
+        #targetsPerCluster = round(numTargets / len(clusterPoints)) 
 
+        numOfPoints = 0
+        for cluster in clusterPoints:
+            numOfPoints = numOfPoints + len(cluster)
+        
         for i in range(len(clusterPoints)):
 
+            #targetPixels.extend(random.sample(clusterPoints[i], round(numTargets * (len(clusterPoints[i]) / numOfPoints))))
+
             # calculate the spacing to even distrubute the target pixels within the cluster
-            gap = math.floor(len(clusterPoints[i]) / targetsPerCluster)
+            gap = math.floor(len(clusterPoints[i]) / round(numTargets * (len(clusterPoints[i]) / numOfPoints)))
             val = 0 # variable to move through cluster list
 
             # collect targets from cluster
             while val < len(clusterPoints[i]):
                 targetPixels.append(clusterPoints[i][val])
                 val = val + gap # increment value to next point to add
-
+        
         #targetPixels = random.sample(self.pixelList, numTargets)
         #print(str(len(targetPixels)))
 
@@ -223,9 +229,10 @@ if __name__ == '__main__':
     root.withdraw()
     imgFile = askopenfilename(title="select image to use", filetypes=(("PNG files", ".png"), ("JPEG files", ".jpg"), ("all files", ".")))
 
-    painter = ImagePlotter(imgFile, 38.6001, -77.1622, 10000)
+    #painter = ImagePlotter(imgFile, 38.6001, -77.1622, 10000)
+    painter = ImagePlotter(imgFile, 0, 0, 10000)
 
-    coords = painter.getCoords(200)
+    coords = painter.getCoords(100)
 
     debug = open('test.txt', 'w')
     
