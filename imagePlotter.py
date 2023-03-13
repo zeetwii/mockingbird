@@ -149,7 +149,7 @@ class ImagePlotter:
         # gets distance from all neighbours
         neighbors = NearestNeighbors(n_neighbors=11).fit(np.asarray(pixelList))
         distances, indices = neighbors.kneighbors(np.asarray(pixelList))
-        distances = np.sort(distances[:,10], axis=0)
+        distances = np.sort(distances[:,len(distances[0])-1], axis=0)
 
         # find knee point
         knee = KneeLocator(np.arange(len(distances)), distances, S=1, curve='convex', direction='increasing', interp_method='polynomial')
@@ -162,9 +162,7 @@ class ImagePlotter:
         #print(str(nClusters))
         
         # creates a list of lists to hold each point in its cluster
-        clusterPoints = []
-        for i in range(nClusters):
-            clusterPoints.append([])
+        clusterPoints = [ [] for _ in range(nClusters) ]
 
         #print(str(clusterPoints))
 
@@ -230,7 +228,7 @@ if __name__ == '__main__':
     imgFile = askopenfilename(title="select image to use", filetypes=(("PNG files", ".png"), ("JPEG files", ".jpg"), ("all files", ".")))
 
     #painter = ImagePlotter(imgFile, 38.6001, -77.1622, 10000)
-    painter = ImagePlotter(imgFile, 0, 0, 10000)
+    painter = ImagePlotter(imgFile, 0, 0, 2000)
 
     coords = painter.getCoords(100)
 
