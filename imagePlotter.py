@@ -25,10 +25,10 @@ class ImagePlotter:
         Initialization method
 
         Args:
-            imgFile (_type_): _description_
-            lat (_type_): _description_
-            lon (_type_): _description_
-            width (_type_): _description_
+            imgFile (file): The image to paint
+            lat (float): the center lat point in degrees
+            lon (float): the center lon point in degrees
+            width (float): the width in km of the image when painted
         """
         
         self.centerLat = math.radians(float(lat))
@@ -225,12 +225,20 @@ if __name__ == '__main__':
     
     root = tk.Tk()
     root.withdraw()
+
+    print("Welcome to the Image plotter script")
+
     imgFile = askopenfilename(title="select image to use", filetypes=(("PNG files", ".png"), ("JPEG files", ".jpg"), ("all files", ".")))
+    lat = input("Enter the desired center latitude (decimal format) of the image: ")
+    lon = input("Enter the desired center longitude (decimal format) of the image: ")
+    width = input("Enter the desired width in KM of the image: ")
+    targetNum = input("Enter the number of aircraft to make up the image: ")
 
     #painter = ImagePlotter(imgFile, 38.6001, -77.1622, 10000)
-    painter = ImagePlotter(imgFile, 0, 0, 2000)
+    #painter = ImagePlotter(imgFile, 0, 0, 2000)
+    painter = ImagePlotter(imgFile, float(lat), float(lon), float(width))
 
-    coords = painter.getCoords(100)
+    coords = painter.getCoords(int(targetNum))
 
     debug = open('test.txt', 'w')
     
