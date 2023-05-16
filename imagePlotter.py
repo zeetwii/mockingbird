@@ -69,7 +69,7 @@ class ImagePlotter:
 
         # TODO: Have this update the rest of the image stuff
 
-    def getCoords(self, numTargets):
+    def getCoords(self, numTargets, visualize=False):
         '''
         Pulls a user given number of lat lon coordinates from the loaded image and returns them
         '''
@@ -99,6 +99,27 @@ class ImagePlotter:
         
         #targetPixels = random.sample(self.pixelList, numTargets)
         #print(str(len(targetPixels)))
+
+        if visualize: # display a picture representing what the transmitted image should look like
+            
+            # gets max X and Y values
+            maxX = 0
+            maxY = 0
+            for pix in targetPixels:
+                if pix[1] > maxX:
+                    maxX = pix[1]
+                if pix[0] > maxY:
+                    maxY = pix[0]
+            #print(f"{str(maxX)} : {str(maxY)}")
+            
+            demoImg = Image.new(mode="RGB", size=(maxX+1, maxY+1))
+            pixelMap = demoImg.load()
+
+            for pix in targetPixels:
+                #print(f"{str(pix[0])} : {str(pix[1])}")
+                pixelMap[pix[1], pix[0]] = (255, 255, 255)
+            demoImg.show()
+
 
         return self.__pixelsToCoords(targetPixels)
 
@@ -232,13 +253,23 @@ if __name__ == '__main__':
     lat = input("Enter the desired center latitude (decimal format) of the image: ")
     lon = input("Enter the desired center longitude (decimal format) of the image: ")
     width = input("Enter the desired width in KM of the image: ")
-    targetNum = input("Enter the number of aircraft to make up the image: ")
+    
 
     #painter = ImagePlotter(imgFile, 38.6001, -77.1622, 10000)
     #painter = ImagePlotter(imgFile, 0, 0, 2000)
     painter = ImagePlotter(imgFile, float(lat), float(lon), float(width))
 
-    coords = painter.getCoords(int(targetNum))
+    acceptable = False
+
+    while not acceptable:
+        targetNum = input("Enter the number of aircraft to make up the image: ")
+        coords = painter.getCoords(int(targetNum), True)
+
+        choice = input("If output is acceptable, enter 1.  Anything else will loop.  ")
+        if choice == '1':
+            acceptable = True
+
+
 
     debug = open('test.txt', 'w')
     
