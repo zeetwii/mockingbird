@@ -4,7 +4,7 @@ category: '[adsb]'
 
 templates:
   imports: from gnuradio import adsb
-  make: adsb.adsbGen(${portNum})
+  make: adsb.adsbGen(${ipAddress}, ${portNum}, ${sampleRate})
 
 #  Make one 'parameters' list entry for every parameter you want settable from the GUI.
 #     Keys include:
@@ -13,13 +13,20 @@ templates:
 #     * dtype (e.g. int, float, complex, byte, short, xxx_vector, ...)
 #     * default
 parameters:
+- id: ipAddress
+  label: IP Address
+  dtype: string
+  default: 0.0.0.0
+
 - id: portNum
-  label: Port to listen on
+  label: Port Number
   dtype: string
   default: 7331
-#- id: ...
-#  label: ...
-#  dtype: ...
+
+- id: sampleRate
+  label: Sample Rate
+  dtype: float
+  default: 2000000
 
 #  Make one 'inputs' list entry per input and one 'outputs' list entry per output.
 #  Keys include:

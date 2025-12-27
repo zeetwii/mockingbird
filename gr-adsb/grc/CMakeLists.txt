@@ -7,5 +7,4 @@
 #
 
 install(FILES
-    adsb_adsbGen.block.yml DESTINATION share/gnuradio/grc/blocks
-)
+    adsb_adsbGen.block.yml DESTINATION share/gnuradio/grc/blocks)

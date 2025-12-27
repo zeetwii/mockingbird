@@ -11,34 +11,34 @@
 ########################################################################
 include(GrPlatform) #define LIB_SUFFIX
 
-list(APPEND adsb_sources
-)
+list(APPEND adsb_sources)
 
-set(adsb_sources "${adsb_sources}" PARENT_SCOPE)
+set(adsb_sources
+    "${adsb_sources}"
+    PARENT_SCOPE)
 if(NOT adsb_sources)
-    MESSAGE(STATUS "No C++ sources... skipping lib/")
+    message(STATUS "No C++ sources... skipping lib/")
     return()
 endif(NOT adsb_sources)
 
 add_library(gnuradio-adsb SHARED ${adsb_sources})
 target_link_libraries(gnuradio-adsb gnuradio::gnuradio-runtime)
-target_include_directories(gnuradio-adsb
+target_include_directories(
+    gnuradio-adsb
     PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>
-    PUBLIC $<INSTALL_INTERFACE:include>
-  )
+    PUBLIC $<INSTALL_INTERFACE:include>)
 set_target_properties(gnuradio-adsb PROPERTIES DEFINE_SYMBOL "gnuradio_adsb_EXPORTS")
 
 if(APPLE)
-    set_target_properties(gnuradio-adsb PROPERTIES
-        INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
-    )
+    set_target_properties(gnuradio-adsb PROPERTIES INSTALL_NAME_DIR
+                                                    "${CMAKE_INSTALL_PREFIX}/lib")
 endif(APPLE)
 
 ########################################################################
 # Install built library files
 ########################################################################
 include(GrMiscUtils)
-GR_LIBRARY_FOO(gnuradio-adsb)
+gr_library_foo(gnuradio-adsb)
 
 ########################################################################
 # Print summary
@@ -54,18 +54,15 @@ include(GrTest)
 # If your unit tests require special include paths, add them here
 #include_directories()
 # List all files that contain Boost.UTF unit tests here
-list(APPEND test_adsb_sources
-)
+list(APPEND test_adsb_sources)
 # Anything we need to link to for the unit tests go here
 list(APPEND GR_TEST_TARGET_DEPS gnuradio-adsb)
 
 if(NOT test_adsb_sources)
-    MESSAGE(STATUS "No C++ unit tests... skipping")
+    message(STATUS "No C++ unit tests... skipping")
     return()
 endif(NOT test_adsb_sources)
 
 foreach(qa_file ${test_adsb_sources})
-    GR_ADD_CPP_TEST("adsb_${qa_file}"
-        ${CMAKE_CURRENT_SOURCE_DIR}/${qa_file}
-    )
+    gr_add_cpp_test("adsb_${qa_file}" ${CMAKE_CURRENT_SOURCE_DIR}/${qa_file})
 endforeach(qa_file)

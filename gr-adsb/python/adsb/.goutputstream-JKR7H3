@@ -20,9 +20,9 @@ add_subdirectory(bindings)
 # Install python sources
 ########################################################################
 gr_python_install(FILES 
-                    __init__.py
-                    adsbGen.py 
-                DESTINATION ${GR_PYTHON_DIR}/gnuradio/adsb)
+			__init__.py
+			adsbGen.py
+		DESTINATION ${GR_PYTHON_DIR}/gnuradio/adsb)
 
 ########################################################################
 # Handle the unit tests

@@ -9,7 +9,4 @@
 ########################################################################
 # Install public header files
 ########################################################################
-install(FILES
-    api.h
-    DESTINATION include/gnuradio/adsb
-)
+install(FILES api.h DESTINATION include/gnuradio/adsb)

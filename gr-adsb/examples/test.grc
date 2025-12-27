@@ -1,17 +1,17 @@
 options:
   parameters:
-    author: ZeeTwii
+    author: ''
     catch_exceptions: 'True'
     category: '[GRC Hier Blocks]'
     cmake_opt: ''
     comment: ''
     copyright: ''
-    description: Sample ADS-B generation flowgraph
+    description: ''
     gen_cmake: 'On'
     gen_linking: dynamic
     generate_options: qt_gui
     hier_block_src_path: '.:'
-    id: adsbTest
+    id: test
     max_nouts: '0'
     output_language: python
     placement: (0,0)
@@ -22,7 +22,7 @@ options:
     run_options: prompt
     sizing_mode: fixed
     thread_safe_setters: ''
-    title: ADS-B Example
+    title: Not titled yet
     window_size: (1000,1000)
   states:
     bus_sink: false
@@ -33,11 +33,23 @@ options:
     state: enabled
 
 blocks:
+- name: center_freq
+  id: variable
+  parameters:
+    comment: ''
+    value: 1090e6
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [296, 8.0]
+    rotation: 0
+    state: enabled
 - name: samp_rate
   id: variable
   parameters:
     comment: ''
-    value: 2e6
+    value: 8e6
   states:
     bus_sink: false
     bus_source: false
@@ -51,16 +63,74 @@ blocks:
     affinity: ''
     alias: ''
     comment: ''
+    ipAddress: 0.0.0.0
     maxoutbuf: '0'
     minoutbuf: '0'
     portNum: '7331'
+    sampleRate: samp_rate
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [32, 180.0]
+    coordinate: [16, 280.0]
     rotation: 0
-    state: true
+    state: enabled
+- name: analog_sig_source_x_0
+  id: analog_sig_source_x
+  parameters:
+    affinity: ''
+    alias: ''
+    amp: '2'
+    comment: ''
+    freq: '1'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    offset: '0'
+    phase: '0'
+    samp_rate: samp_rate
+    showports: 'False'
+    type: float
+    waveform: analog.GR_SQR_WAVE
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [16, 384.0]
+    rotation: 0
+    state: disabled
+- name: blocks_correctiq_0
+  id: blocks_correctiq
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [424, 352.0]
+    rotation: 0
+    state: enabled
+- name: blocks_file_sink_0
+  id: blocks_file_sink
+  parameters:
+    affinity: ''
+    alias: ''
+    append: 'False'
+    comment: ''
+    file: /home/zee/test.cfile
+    type: complex
+    unbuffered: 'False'
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [792, 272.0]
+    rotation: 0
+    state: enabled
 - name: blocks_float_to_complex_0
   id: blocks_float_to_complex
   parameters:
@@ -74,28 +144,30 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [184, 272.0]
+    coordinate: [264, 336.0]
     rotation: 0
-    state: true
-- name: blocks_throttle_0
-  id: blocks_throttle
+    state: enabled
+- name: blocks_throttle2_0
+  id: blocks_throttle2
   parameters:
     affinity: ''
     alias: ''
     comment: ''
     ignoretag: 'True'
+    limit: auto
+    maximum: '0.1'
     maxoutbuf: '0'
     minoutbuf: '0'
     samples_per_second: samp_rate
-    type: float
+    type: complex
     vlen: '1'
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [232, 180.0]
+    coordinate: [608, 232.0]
     rotation: 0
-    state: disabled
+    state: enabled
 - name: qtgui_sink_x_0
   id: qtgui_sink_x
   parameters:
@@ -103,7 +175,7 @@ blocks:
     alias: ''
     bw: samp_rate
     comment: ''
-    fc: 1.09e9
+    fc: center_freq
     fftsize: '1024'
     gui_hint: ''
     maxoutbuf: '0'
@@ -115,16 +187,16 @@ blocks:
     plotwaterfall: 'True'
     rate: '10'
     showports: 'False'
-    showrf: 'True'
-    type: float
+    showrf: 'False'
+    type: complex
     wintype: window.WIN_BLACKMAN_hARRIS
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [392, 148.0]
+    coordinate: [792, 144.0]
     rotation: 0
-    state: disabled
+    state: enabled
 - name: qtgui_sink_x_1
   id: qtgui_sink_x
   parameters:
@@ -132,7 +204,7 @@ blocks:
     alias: ''
     bw: samp_rate
     comment: ''
-    fc: 1090e6
+    fc: '0'
     fftsize: '1024'
     gui_hint: ''
     maxoutbuf: '0'
@@ -144,16 +216,16 @@ blocks:
     plotwaterfall: 'True'
     rate: '10'
     showports: 'False'
-    showrf: 'True'
+    showrf: 'False'
     type: complex
     wintype: window.WIN_BLACKMAN_hARRIS
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [416, 340.0]
+    coordinate: [528, 600.0]
     rotation: 0
-    state: true
+    state: disabled
 - name: soapy_hackrf_sink_0
   id: soapy_hackrf_sink
   parameters:
@@ -161,7 +233,7 @@ blocks:
     alias: ''
     amp: 'True'
     bandwidth: '0'
-    center_freq: 1090e6
+    center_freq: center_freq
     comment: ''
     dev_args: ''
     samp_rate: samp_rate
@@ -171,17 +243,20 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [424, 264.0]
+    coordinate: [824, 472.0]
     rotation: 0
-    state: true
+    state: disabled
 
 connections:
 - [adsb_adsbGen_0, '0', blocks_float_to_complex_0, '0']
-- [adsb_adsbGen_0, '0', blocks_throttle_0, '0']
-- [blocks_float_to_complex_0, '0', qtgui_sink_x_1, '0']
-- [blocks_float_to_complex_0, '0', soapy_hackrf_sink_0, '0']
-- [blocks_throttle_0, '0', qtgui_sink_x_0, '0']
+- [analog_sig_source_x_0, '0', blocks_float_to_complex_0, '0']
+- [blocks_correctiq_0, '0', blocks_throttle2_0, '0']
+- [blocks_correctiq_0, '0', qtgui_sink_x_1, '0']
+- [blocks_correctiq_0, '0', soapy_hackrf_sink_0, '0']
+- [blocks_float_to_complex_0, '0', blocks_correctiq_0, '0']
+- [blocks_throttle2_0, '0', blocks_file_sink_0, '0']
+- [blocks_throttle2_0, '0', qtgui_sink_x_0, '0']
 
 metadata:
   file_format: 1
-  grc_version: 3.10.4.0
+  grc_version: 3.10.9.2
